@@ -14,39 +14,35 @@ def _pretty(jsonres):
     print json.dumps(jsonres,
             indent = 4, separators=(',', ': '))
 
+### INIT ###
+def _dircheck():
+    try:
+        os.makedirs(FULL_DIR)
+    except OSError:
+        if not os.path.isdir(FULL_DIR):
+            raise
+
+def _filecheck():
+    if not os.path.isfile(FULL_DIR_FILE):
+        open(FULL_DIR_FILE, "w").close()
+
+### API ###
 def _makeURL(endpoint,id=None):
     arr = [BASE_URL,VERSION,endpoint,str(id)] if id\
             else [BASE_URL,VERSION,endpoint]
     return "/".join(arr)+".json"
 
-def _popCache(stories,fh):
-    fh.seek(0) #return to the beginning of file to write
-    fh.write(str(_getTime())+ "\n")
-    json.dump(stories,fh)
+def _populateCache(stories):
+    with open(FULL_DIR_FILE, "w") as fh:
+        fh.write(str(_getTime())+ "\n")
+        json.dump(stories,fh)
     
+def _checkExpired():
+    with open(FULL_DIR_FILE, "r") as fh:
+        line1 = fh.readline().rstrip()
+        return True if line1 == "" or int(line1) < _getTime() - EXPIRES_IN else False
 
-def _cacheStories(stories):
-    home = os.path.expanduser("~")
-    dirr = ".hn"
-    filename = "story_cache"
-
-    fulldir = os.path.join(home,dirr)
-    fulldirfile = os.path.join(fulldir,filename)
-
-    #using try/except prevents any race conditions
-    try:
-        os.makedirs(fulldir)
-    except OSError:
-        if not os.path.isdir(fulldir):
-            raise
-
-    if not os.path.isfile(fulldirfile):
-        open(fulldirfile,"w").close()
-
-    with open(fulldirfile,"r+") as f:
-        line1 = f.readline()
-        if line1 == "": #file hasn't been populated yet
-            _popCache(stories,f)
-        else:
-            if int(line1.rstrip()) > _getTime() + EXPIRES_IN: #results expired, repopulate file
-                _popCache(stories,f)
+def _topStoryFile():
+    f = open(FULL_DIR_FILE, "r")
+    f.readline()
+    return f
