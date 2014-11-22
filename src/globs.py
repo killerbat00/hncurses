@@ -4,3 +4,4 @@
 BASE_URL = "https://hacker-news.firebaseio.com"
 VERSION = "v0"
 DEBUG = True
+EXPIRES_IN = 120
