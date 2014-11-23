@@ -32,17 +32,13 @@ def _makeURL(endpoint,id=None):
             else [BASE_URL,VERSION,endpoint]
     return "/".join(arr)+".json"
 
-def _populateCache(stories):
-    with open(FULL_DIR_FILE, "w") as fh:
-        fh.write(str(_getTime())+ "\n")
-        json.dump(stories,fh)
-    
 def _checkExpired():
     with open(FULL_DIR_FILE, "r") as fh:
         line1 = fh.readline().rstrip()
         return True if line1 == "" or int(line1) < _getTime() - EXPIRES_IN else False
 
-def _topStoryFile():
-    f = open(FULL_DIR_FILE, "r")
-    f.readline()
+def _topStoryFile(mode):
+    f = open(FULL_DIR_FILE, mode)
+    if mode == "r":
+        f.readline()
     return f

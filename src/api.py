@@ -15,18 +15,26 @@ def getSingle(type=None,id=None):
     return requests.get(url).json()
 
 def _retrieveStories():
-    from utils import _checkExpired,_populateCache,_topStoryFile
-    stories = None
+    from utils import _checkExpired,_topStoryFile,_getTime
+    from globs import FULL_DIR_FILE
+    stories = []
     if _checkExpired():
-        stories = getSingle("topstories")
-        _populateCache(stories)
+        storyList = getSingle("topstories")
+        f = _topStoryFile("w")
+        f.write(str(_getTime()) + "\n")
+        for story in storyList:
+            s = json.dumps(getSingle("item", story))
+            stories.append(s)
+            f.write(s+"\n")
+        f.close()
     else:
-        f = _topStoryFile()
-        stories = json.load(f)
+        f = _topStoryFile("r")
+        stories = f.readlines()
         f.close()
 
     return stories
 
 def getTopStories(key):
     for story in _retrieveStories():
-        print getSingle("item",story)[key]
+        story = json.loads(story.rstrip())
+        print story["title"] + "\t" + str(story["score"])
