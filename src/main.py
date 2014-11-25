@@ -3,8 +3,13 @@
 
 from api2 import *
 from config import DevConfig as config
-from utils import _pretty,_dircheck,_filecheck
+from utils import _dircheck,_filecheck
+
+def init():
+    _dircheck(config.FULL_DIR)
+    _filecheck(config.CACHE_FILE)
 
 if __name__=="__main__":
+    init()
     hn = HN(config)
-    print hn.get_single("user","killerbat00")
+    hn.get_frontpage()

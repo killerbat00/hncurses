@@ -9,13 +9,12 @@ class Config():
     DEBUG = False
     EXPIRES_IN = 900
 
-
     ### GENERAL CONFIG ###
     HOME=expanduser("~")
     DIR=".hn"
-    STORY_CACHE="top_story_full_cache"
+    CACHE_FILENAME="hn-frontpage"
     FULL_DIR=join(HOME,DIR)
-    FULL_DIR_FILE=join(FULL_DIR,STORY_CACHE)
+    CACHE_FILE=join(FULL_DIR,CACHE_FILENAME)
 
 class TestConfig(Config):
     pass

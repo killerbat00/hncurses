@@ -7,24 +7,17 @@ import time
 
 from config import *
 
-def _getTime():
-    return int(time.time())
-
-def _pretty(jsonres):
-    print json.dumps(jsonres,
-            indent = 4, separators=(',', ': '))
-
 ### INIT ###
-def _dircheck():
+def _dircheck(hn_dir):
     try:
-        os.makedirs(FULL_DIR)
+        os.makedirs(hn_dir)
     except OSError:
-        if not os.path.isdir(FULL_DIR):
+        if not os.path.isdir(hn_dir):
             raise
 
-def _filecheck():
-    if not os.path.isfile(FULL_DIR_FILE):
-        open(FULL_DIR_FILE, "w").close()
+def _filecheck(cachefile):
+    if not os.path.isfile(cachefile):
+        open(cachefile, "w").close()
 
 ### API ###
 def _makeURL(endpoint,id=None):
@@ -32,13 +25,17 @@ def _makeURL(endpoint,id=None):
             else [BASE_URL,VERSION,endpoint]
     return "/".join(arr)+".json"
 
-def _checkExpired():
-    with open(FULL_DIR_FILE, "r") as fh:
+def _checkExpired(cachefile,expiry):
+    with open(cachefile, "r") as fh:
         line1 = fh.readline().rstrip()
-        return True if line1 == "" or int(line1) < _getTime() - EXPIRES_IN else False
+        return True if line1 == "" or int(line1) < _getTime() - expiry else False
 
-def _topStoryFile(mode):
-    f = open(FULL_DIR_FILE, mode)
+def _cacheFile(filename,mode):
+    f = open(filename, mode)
     if mode == "r":
         f.readline()
     return f
+
+def _getTime():
+    return int(time.time())
+
