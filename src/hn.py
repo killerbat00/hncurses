@@ -11,7 +11,6 @@ class HN():
     '''
     Base class for communicating with the HN API.
     '''
-
     def __init__(self, config):
         '''
         Sets up the requests session with the API.
@@ -40,12 +39,12 @@ class HN():
         '''
         arr = [self.baseurl,endpoint,str(id)] if id\
                 else [self.baseurl,endpoint]
+
         return "/".join(arr)+".json"
 
     def get_single(self,endpoint,id=None):
         '''
         Retrieves a single item or user from the API.
-
 
         Keyword arguments:
         endpoint -- API endpoint. Can be 'user' or 'item'
@@ -67,6 +66,7 @@ class HN():
                 print type(err)
                 print err.args
                 print err
+
         return result
 
     def get_multi(self,endpoint,ids):
@@ -92,6 +92,7 @@ class HN():
                 print type(err)
                 print err.args
                 print err
+
         return results
 
     def _retrieve_stories(self):
@@ -122,6 +123,7 @@ class HN():
             f = _cacheFile(cachefile,"r")
             stories = f.readlines()
             f.close()
+
         return stories
 
     def get_frontpage(self):
@@ -131,7 +133,26 @@ class HN():
         to decide to load the cache or new stories. 
         TODO: Once further development is complete, we'll see if
         this method of getting the front page is the most efficient.
+
+        Returns:
+        List of JSON encoded story objects.
         '''
-        for story in self._retrieve_stories():
-            story = json.loads(story.rstrip())
-            print story["title"] + "\t" + str(story["score"])
+        return self._retrieve_stories()
+
+    def get_max_item_id(self):
+        '''
+        Retrieve current max item ID.
+
+        Returns:
+        Max item ID.
+        '''
+        return int(self.get_single("maxitem"))
+
+    def get_updates(self):
+        '''
+        Retrieve item and profile changes.
+
+        Returns:
+        JSON of items and profiles that have been recently updated.
+        '''
+        return self.get_single("updates")
