@@ -5,7 +5,7 @@ import json
 import os
 import time
 
-from globs import *
+from config import *
 
 def _getTime():
     return int(time.time())
