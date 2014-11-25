@@ -45,6 +45,7 @@ def _makeURL(endpoint,id=None):
     '''
     arr = [BASE_URL,VERSION,endpoint,str(id)] if id\
             else [BASE_URL,VERSION,endpoint]
+
     return "/".join(arr)+".json"
 
 def _checkExpired(cachefile,expiry):
@@ -60,6 +61,7 @@ def _checkExpired(cachefile,expiry):
     '''
     with open(cachefile, "r") as fh:
         line1 = fh.readline().rstrip()
+
         return True if line1 == "" or int(line1) < _getTime() - expiry else False
 
 def _cacheFile(filename,mode):
@@ -78,6 +80,7 @@ def _cacheFile(filename,mode):
     f = open(filename, mode)
     if mode == "r":
         f.readline()
+
     return f
 
 def _getTime():
