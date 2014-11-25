@@ -15,9 +15,10 @@ class Config():
     CACHE_FILENAME="hn-frontpage"
     FULL_DIR=join(HOME,DIR)
     CACHE_FILE=join(FULL_DIR,CACHE_FILENAME)
+    MAX_WORKERS = 20
 
 class TestConfig(Config):
     pass
 
 class DevConfig(Config):
-    Config.DEBUG = True
+    DEBUG = True

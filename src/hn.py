@@ -24,7 +24,7 @@ class HN():
         '''
         self.config = config
         self.baseurl = "/".join([self.config.BASE_URL, self.config.VERSION])
-        self.session = FuturesSession(max_workers=15)
+        self.session = FuturesSession(max_workers=config.MAX_WORKERS)
 
     def _make_URL(self,endpoint,id=None):
         '''

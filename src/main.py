@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from api2 import *
+from hn import *
 from config import DevConfig as config
 from utils import _dircheck,_filecheck
 
