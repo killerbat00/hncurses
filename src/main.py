@@ -6,6 +6,9 @@ from config import DevConfig as config
 from utils import _dircheck,_filecheck
 
 def init():
+    '''
+    Initialize requisite directories and files.
+    '''
     _dircheck(config.FULL_DIR)
     _filecheck(config.CACHE_FILE)
 

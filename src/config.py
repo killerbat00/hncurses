@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 from os.path import expanduser,join
 
 class Config():
-    ### API CONFIG ###
+    '''
+    Contains basic configuration directives.
+    '''
     BASE_URL = "https://hacker-news.firebaseio.com"
     VERSION = "v0"
     DEBUG = False
     EXPIRES_IN = 900
 
-    ### GENERAL CONFIG ###
     HOME=expanduser("~")
     DIR=".hn"
     CACHE_FILENAME="hn-frontpage"
@@ -18,7 +20,13 @@ class Config():
     MAX_WORKERS = 20
 
 class TestConfig(Config):
+    '''
+    Overridden config directives specifically for testing.
+    '''
     pass
 
 class DevConfig(Config):
+    '''
+    Overridden config directives specifically for developing.
+    '''
     DEBUG = True

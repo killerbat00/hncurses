@@ -19,8 +19,8 @@ class HN():
         for concurrent requests.
 
         Keyword arguments:
-        baseurl  -- HN API URL
-        config   -- config object with various params related 
+        baseurl  -- HN API URL.
+        config   -- config object with various params related.
         '''
         self.config = config
         self.baseurl = "/".join([self.config.BASE_URL, self.config.VERSION])
@@ -31,9 +31,12 @@ class HN():
         Formats the URL with endpoint, id and json extension.
 
         Keyword arguments:
-        endpoint -- API endpoint from which to retrieve data
-        id       -- ID of item/user to retrieve.
+        endpoint -- API endpoint from which to retrieve data.
+        id       -- ID of object to retrieve.
                     ID defaults to None if no argument is given.
+
+        Returns:
+        URL for specific object.
         '''
         arr = [self.baseurl,endpoint,str(id)] if id\
                 else [self.baseurl,endpoint]
@@ -47,6 +50,11 @@ class HN():
         Keyword arguments:
         endpoint -- API endpoint. Can be 'user' or 'item'
         id       -- ID of item/user
+
+        Returns:
+        JSON encoded result of all information from object.
+        On error, returns the error.
+
         '''
         url = self._make_URL(endpoint,id)
         resp = self.session.get(url)
@@ -67,8 +75,13 @@ class HN():
         Currently doesn't support retrieving mixed object types.
 
         Keyword arguments:
-        endpoint -- URL endpoint of objects
-        ids      -- List of ids to retrieve
+        endpoint -- URL endpoint of objects.
+        ids      -- List of ids to retrieve.
+
+        Returns:
+        List of JSON encoded objects for each item.
+        On error, returns List(err)
+
         '''
         res = map(self.session.get, [self._make_URL(endpoint,id) for id in ids])
         try:
@@ -82,6 +95,19 @@ class HN():
         return results
 
     def _retrieve_stories(self):
+        '''
+        Helper function to retrieve the front page.
+        This method checks against a timeout value
+        to decide whether to load the cache or
+        request new stories. It then retrieves the JSON 
+        encoded story objects. Once the stories are
+        retrieved, they're stored in the cache if necessary.
+        TODO: Once further development is complete, we'll see if
+        this method of getting the front page is the most efficient.
+
+        Returns:
+        List of JSON encoded story objects.
+        '''
         from utils import _checkExpired, _cacheFile, _getTime
         stories = []
         cachefile = self.config.CACHE_FILE
