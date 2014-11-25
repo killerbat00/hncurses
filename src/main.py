@@ -20,5 +20,5 @@ if __name__=="__main__":
         story = json.loads(story.rstrip())
         print story["title"] + "\t" + str(story["score"])
 
-    print hn.max_item_id()
+    print hn.get_max_item_id()
     print hn.get_updates()
