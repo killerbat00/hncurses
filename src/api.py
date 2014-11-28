@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from requests_futures.sessions import FuturesSession
@@ -109,22 +108,22 @@ class HN():
         Returns:
         List of JSON encoded story objects.
         '''
-        from utils import _checkExpired, _cacheFile, _getTime
+        from utils import _check_expired, _get_cache_file, _get_time
         stories = []
         cachefile = self.config.CACHE_FILE
-        if _checkExpired(cachefile,self.config.EXPIRES_IN):
+        if _check_expired(cachefile,self.config.EXPIRES_IN):
             storyList = self.get_single("topstories")
-            f = _cacheFile(cachefile,"w")
-            f.write(str(_getTime()) + "\n") #store cache-file creation time to check for expiration
+            f = _get_cache_file(cachefile,"w")
+            f.write(str(_get_time()) + "\n") #store cache-file creation time to check for expiration
             stories = map(json.dumps, self.get_multi("item",storyList))
             f.write("\n".join([x for x in stories])) #separate the stories with newline and write to file
             f.close()
         else:
-            f = _cacheFile(cachefile,"r")
+            f = _get_cache_file(cachefile,"r")
             stories = f.readlines()
             f.close()
 
-        return stories
+        return map(json.loads, [story.rstrip() for story in stories])
 
     def get_frontpage(self):
         '''

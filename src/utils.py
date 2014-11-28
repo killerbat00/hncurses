@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import json
@@ -31,7 +30,7 @@ def _filecheck(cachefile):
     if not os.path.isfile(cachefile):
         open(cachefile, "w").close()
 
-def _makeURL(endpoint,id=None):
+def _make_URL(endpoint,id=None):
     '''
     Construct URL for json API request.
 
@@ -48,7 +47,7 @@ def _makeURL(endpoint,id=None):
 
     return "/".join(arr)+".json"
 
-def _checkExpired(cachefile,expiry):
+def _check_expired(cachefile,expiry):
     '''
     Check if the cache file is expired.
 
@@ -62,9 +61,9 @@ def _checkExpired(cachefile,expiry):
     with open(cachefile, "r") as fh:
         line1 = fh.readline().rstrip()
 
-        return True if line1 == "" or int(line1) < _getTime() - expiry else False
+        return True if line1 == "" or int(line1) < _get_time() - expiry else False
 
-def _cacheFile(filename,mode):
+def _get_cache_file(filename,mode):
     '''
     Open the cache file, throwing away the first line
     if we open in read mode. Doing so allows us to
@@ -83,7 +82,7 @@ def _cacheFile(filename,mode):
 
     return f
 
-def _getTime():
+def _get_time():
     '''
     Get current seconds since epoch as an int.
 
