@@ -32,6 +32,10 @@ def main(api,screen):
             screen.move_up(screen.content)
         if event == ord('j'):
             screen.move_down(screen.content)
+        if event == ord('l'):
+            screen.open_link()
+        if event == ord('h'):
+            screen.open_hn_item()
         else:
             pass
 
@@ -39,9 +43,18 @@ if __name__=="__main__":
     init()
     hn = api.HN(config)
     screen = gui.Screen()
+
+    try:
+        screen.check_dimensions()
+    except:
+        screen.end()
+        print "Please resize your terminal to have > 80 columns."
+        sys.exit(1)
+
     try:
         main(hn,screen)
         screen.end()
     except:
         screen.end()
         traceback.print_exc(file=sys.stdout)
+        sys.exit(1)
