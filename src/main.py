@@ -9,6 +9,7 @@ import gui
 import threading
 import traceback
 import sys
+from curses import KEY_ENTER,KEY_RESIZE
 
 def init():
     '''
@@ -35,22 +36,31 @@ def main(api,screen):
         if event == ord('l'):
             screen.open_link()
         if event == ord('h'):
-            screen.open_hn_item()
+            screen.open_link_hn()
+        if event == KEY_ENTER:
+            screen.open_item()
+        if event == KEY_RESIZE:
+            try:
+                screen.resize()
+                screen.check_dimensions()
+            except:
+                screen_size_exit()
+
+        if event == ord('q'):
+            break
         else:
             pass
 
 if __name__=="__main__":
     init()
     hn = api.HN(config)
-    screen = gui.Screen()
+    screen = gui.Screen(config.APP_VERSION)
 
     try:
         screen.check_dimensions()
     except:
         screen.end()
         print "Please resize your terminal to have > 80 columns."
-        sys.exit(1)
-
     try:
         main(hn,screen)
         screen.end()

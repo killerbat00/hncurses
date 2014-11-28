@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import curses
-import locale
 import datetime
 import webbrowser
 
@@ -15,9 +14,8 @@ def end_curses():
     curses.endwin()
 
 class Screen():
-    def __init__(self):
-        locale.setlocale(locale.LC_ALL, '')
-        self.code = locale.getpreferredencoding()
+    def __init__(self,version):
+        self.version = version
 
         self.root = curses.initscr()
         self.root_maxy,self.root_maxx=self.root.getmaxyx()
@@ -36,7 +34,8 @@ class Screen():
         init_curses()
 
     def check_dimensions(self):
-        if self.root_maxx < 80:
+        maxy,maxx = self.root.getmaxyx()
+        if maxx <= 80:
             raise Exception
     
     def end(self):
@@ -47,8 +46,8 @@ class Screen():
 
     def draw_header(self):
         self.header.border(0)
-        startx = (self.root_maxx/2)-4
-        self.header.addstr(1,startx,"HNCURSES")
+        startx = (self.root_maxx/2)-int(len("HNCURSES " + "v"+self.version)/2.0)
+        self.header.addstr(1,startx,"HNCURSES " + "v"+self.version)
         self.header.refresh()
 
     def highlight(self,window,y):
@@ -99,9 +98,15 @@ class Screen():
         cursy,cursx = self.content.getyx()
         webbrowser.open_new_tab(self.stories[cursy]["url"])
 
-    def open_hn_item(self):
+    def open_link_hn(self):
         cursy,cursx = self.content.getyx()
         webbrowser.open_new_tab("https://news.ycombinator.com/item?id=" + str(self.stories[cursy]["id"]))
+
+    def open_item(self):
+        pass
+
+    def resize(self):
+        pass
 
     def write_story(self, window, story, count):
 

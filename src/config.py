@@ -7,6 +7,7 @@ class Config():
     Contains basic configuration directives.
     '''
     BASE_URL = "https://hacker-news.firebaseio.com"
+    APP_VERSION = "0.5"
     VERSION = "v0"
     DEBUG = False
     EXPIRES_IN = 900
