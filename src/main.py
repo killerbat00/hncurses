@@ -9,7 +9,7 @@ import gui
 import threading
 import traceback
 import sys
-from curses import KEY_ENTER,KEY_RESIZE
+from curses import KEY_ENTER, KEY_RESIZE
 
 class ResizeException(Exception):
     def __init__(self):
@@ -24,14 +24,10 @@ def init():
 
 def main(api,screen):
     screen.draw_splash()
+    screen.draw_header()
 
     stories = api.get_frontpage()
-
-    screen.draw_header()
     screen.write_all(stories)
-    screen.draw_footer()
-
-    screen.highlight(screen.content,0)
 
     while 1:
         event = screen.content.getch()

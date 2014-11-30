@@ -34,8 +34,8 @@ class Screen():
         self.bottom_story = self.root_maxy - self.headery - 1
 
         self.timex  = self.root_maxx - 16
-        self.namex  = self.timex - 14
-        self.scorex = self.namex - 8
+        self.namex  = self.timex - 17
+        self.scorex = self.namex - 7
         self.titlen = self.scorex - 4
         self.titlex = 6
 
@@ -63,8 +63,14 @@ class Screen():
         self.header.hline(2, 1, "-", self.root_maxx - 2)
         self.header.refresh()
     
-    def draw_footer(self):
-        pass
+    def draw_footer(self, story):
+        help_text = "(q): quit, (l): open link url, (h): open on HN"
+
+        self.footer.clear()
+        self.footer.addstr(story["title"].encode('ascii', 'ignore'))
+        self.footer.addstr(0, self.root_maxx - len(help_text) - 1, help_text)
+        self.footer.chgat(0, 0, curses.A_REVERSE)
+        self.footer.refresh()
 
     def draw_splash(self):
         from utils import LETTER_Y
@@ -90,10 +96,12 @@ class Screen():
     def move_up(self, window):
         cursy,cursx = window.getyx()
         newcursy    = cursy-1
+        self.draw_footer(self.stories[newcursy])
 
         if newcursy < 0:
             return
 
+        self.draw_footer(self.stories[newcursy])
         self.undo_highlight(window, cursy)
         window.move(newcursy,0)
         self.highlight(window, newcursy)
@@ -104,10 +112,12 @@ class Screen():
         cursy,cursx = window.getyx()
         newcursy    = cursy+1
 
+
         if newcursy >= self.bottom_story:
             self.next_page(window)
             return
 
+        self.draw_footer(self.stories[newcursy])
         self.undo_highlight(window, cursy)
         window.move(newcursy, 0)
         self.highlight(window, newcursy)
@@ -180,13 +190,12 @@ class Screen():
     def _calculate_dimensions(self):
         maxx, maxy = self.root.getmaxyx()
         self.timex  = self.root_maxx - 16
-        self.namex  = self.timex - 14
-        self.scorex = self.namex - 8
+        self.namex  = self.timex - 17
+        self.scorex = self.namex - 7
         self.titlen = self.scorex - 4
 
 
     def _write_story(self, window, index, story):
-
         count  = index + 1
         title  = story["title"].encode('ascii', 'ignore')
 
@@ -200,10 +209,12 @@ class Screen():
     def write_all(self,stories):
         self.stories = stories
 
-        #self._calculate_dimensions()
         self._draw_labels()
 
         for index,story in enumerate(self.stories):
             if index >= self.bottom_story:
                 break
             self._write_story(self.content,index,story)
+
+        self.highlight(self.content,0)
+        self.draw_footer(self.stories[0])
