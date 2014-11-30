@@ -7,9 +7,6 @@ hncurses offers a basic terminal interface for browsing Hacker News.
 
 ![Usage](img/use.gif)
 
-##requirements
-python-requests
-python-requests-futures
 
 ##installation
 ```
