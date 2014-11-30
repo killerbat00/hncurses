@@ -23,7 +23,7 @@ class Screen():
         self.root = curses.initscr()
         self.root_maxy, self.root_maxx = self.root.getmaxyx()
 
-        self.header = curses.newwin(5, self.root_maxx, 0, 0)
+        self.header = curses.newwin(2, self.root_maxx, 0, 0)
         self.headery, self.headerx = self.header.getmaxyx()
 
         self.content = curses.newwin(self.root_maxy - self.headery - 1, self.root_maxx, self.headery, 0)
@@ -57,10 +57,15 @@ class Screen():
         end_curses()
 
     def draw_header(self):
-        self.header.border(0)
+        self.header.border("|","|"," "," "," "," ","|","|")
         startx = int((self.root_maxx / 2.0) - len(self.title) / 2.0) #place title directly in center
-        self.header.addstr(1, startx, self.title)
-        self.header.hline(2, 1, "-", self.root_maxx - 2)
+
+        self.header.addstr(0, startx, self.title)
+
+        self._draw_labels()
+
+        self.header.chgat(0,1,self.root_maxx-2,curses.A_UNDERLINE)
+        self.header.chgat(1,1,self.root_maxx-2,curses.A_UNDERLINE)
         self.header.refresh()
     
     def draw_footer(self, story):
@@ -181,10 +186,10 @@ class Screen():
         pass
 
     def _draw_labels(self):
-        self.header.addstr(3, self.titlex, "Title")
-        self.header.addstr(3, self.scorex + 2, "Score")
-        self.header.addstr(3, self.namex + 3, "By")
-        self.header.addstr(3, self.timex + 3, "Time")
+        self.header.addstr(1, self.titlex, "Title")
+        self.header.addstr(1, self.scorex + 2, "Score")
+        self.header.addstr(1, self.namex + 3, "By")
+        self.header.addstr(1, self.timex + 3, "Time")
         self.header.refresh()
 
     def _calculate_dimensions(self):
@@ -208,8 +213,6 @@ class Screen():
 
     def write_all(self,stories):
         self.stories = stories
-
-        self._draw_labels()
 
         for index,story in enumerate(self.stories):
             if index >= self.bottom_story:
