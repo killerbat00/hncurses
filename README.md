@@ -1,7 +1,7 @@
 hncurses
 ========
 
-hncurses offers a basic termianl interface for browsing Hacker News.
+hncurses offers a basic terminal interface for browsing Hacker News.
 
 ##requirements
 python-requests
