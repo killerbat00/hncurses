@@ -7,6 +7,7 @@ import webbrowser
 def init_curses():
     curses.cbreak()
     curses.noecho()
+    curses.curs_set(0)
 
 def end_curses():
     curses.nocbreak()
@@ -14,28 +15,37 @@ def end_curses():
     curses.endwin()
 
 class Screen():
-    def __init__(self,version):
-        self.version = version
+    def __init__(self, version):
+        self.title = "HNCURSES v" + version
 
         self.root = curses.initscr()
-        self.root_maxy,self.root_maxx=self.root.getmaxyx()
+        self.root_maxy, self.root_maxx = self.root.getmaxyx()
 
-        self.header = self.root.subwin(3,self.root_maxx,0,0)
-        self.content = curses.newwin(100,self.root_maxx,3,0)
+        self.header = curses.newwin(5, self.root_maxx, 0, 0)
+        self.headery, self.headerx = self.header.getmaxyx()
 
+        self.content = curses.newwin(100, self.root_maxx, self.headery, 0)
+
+        self.colors = curses.has_colors()
+    
         self.stories = []
+        self.bottom_story = self.root_maxy - self.headery-1
+
+        self.timex  = self.root_maxx - 16
+        self.namex  = self.timex - 14
+        self.scorex = self.namex - 8
+        self.titlen = self.scorex - 4
+        self.titlex = 6
 
         self.root.keypad(1)
         self.header.keypad(1)
         self.content.keypad(1)
         self.content.scrollok(1)
 
-        self.min_highlight = 0
         init_curses()
 
     def check_dimensions(self):
-        maxy,maxx = self.root.getmaxyx()
-        if maxx <= 80:
+        if self.root_maxx < 80:
             raise Exception
     
     def end(self):
@@ -46,61 +56,92 @@ class Screen():
 
     def draw_header(self):
         self.header.border(0)
-        startx = (self.root_maxx/2)-int(len("HNCURSES " + "v"+self.version)/2.0)
-        self.header.addstr(1,startx,"HNCURSES " + "v"+self.version)
+        startx = int((self.root_maxx / 2.0) - len(self.title) / 2.0) #place title directly in center
+        self.header.addstr(1, startx, self.title)
+        self.header.hline(2, 1, "-", self.root_maxx - 2)
         self.header.refresh()
 
-    def highlight(self,window,y):
-        window.chgat(y,1,self.root_maxx-4,curses.A_REVERSE)
+    def highlight(self, window,y):
+        window.chgat(y, 0, self.root_maxx, curses.A_REVERSE)
         window.refresh()
 
-    def undo_highlight(self,window,y):
-        window.chgat(y,1,self.root_maxx-4,curses.A_NORMAL)
+    def undo_highlight(self, window,y):
+        window.chgat(y, 0, self.root_maxx, curses.A_NORMAL)
         window.refresh()
 
-    def move_up(self,window):
+    def move_up(self, window):
         cursy,cursx = window.getyx()
-        newcursy = cursy-1
-        self.undo_highlight(window,cursy)
-        window.move(newcursy,0)
-        self.highlight(window,newcursy)
+        newcursy    = cursy-1
 
-    def move_down(self,window):
+        if newcursy < 0:
+            return
+
+        self.undo_highlight(window, cursy)
+        window.move(newcursy,0)
+        self.highlight(window, newcursy)
+
+        window.refresh()
+
+    def move_down(self, window):
         cursy,cursx = window.getyx()
-        newcursy = cursy+1
-        self.undo_highlight(window,cursy)
-        window.move(newcursy,0)
-        self.highlight(window,newcursy)
+        newcursy    = cursy+1
 
-    def format_story_number(self,count):
+        if newcursy > self.bottom_story:
+            self.next_page(window)
+            return
+
+        self.undo_highlight(window, cursy)
+        window.move(newcursy, 0)
+        self.highlight(window, newcursy)
+
+        window.refresh()
+
+    def next_page(self, window):
+        pass
+
+    def _format_story_number(self, count):
         count_str = str(count)
+
         if len(count_str) == 1:
-            num = str(count) + "  "
-        elif len(count_str) ==2:
-            num = str(count) + " "
+            num = count_str + "  "
+        elif len(count_str) == 2:
+            num = count_str + " "
         else:
-            num = str(count)
-        return num.encode('ascii','ignore')
+            num = count_str
+
+        return num.encode('ascii', 'ignore')
     
-    def format_score(self,score):
+    def _format_score(self, score):
         score_str = str(score)
+
         if len(score_str) == 1:
-            score = "| ("+score_str+")    "
+            score = "| (" + score_str + ")    "
         elif len(score_str) == 2:
-            score = "| ("+score_str+")   "
+            score = "| (" + score_str + ")   "
         elif len(score_str) == 3:
-            score = "| ("+score_str+")  "
+            score = "| (" + score_str + ")  "
         else:
-            score = "| ("+score_str+") "
-        return score.encode('ascii','ignore')
+            score = "| (" + score_str + ") "
 
-    def open_link(self):
-        cursy,cursx = self.content.getyx()
-        webbrowser.open_new_tab(self.stories[cursy]["url"])
+        return score.encode('ascii', 'ignore')
 
-    def open_link_hn(self):
+    def _format_time(self, story):
+        created_at = datetime.datetime.fromtimestamp(int(story["time"]))
+        delta      = datetime.datetime.now() - created_at
+        hours      = int(delta.seconds/60/60)
+        hours_ago  = str(hours) + "  Hours Ago" if hours/10 < 1 else str(hours) + " Hours Ago"
+
+        return hours_ago
+
+    def open_link(self,hn):
         cursy,cursx = self.content.getyx()
-        webbrowser.open_new_tab("https://news.ycombinator.com/item?id=" + str(self.stories[cursy]["id"]))
+
+        if hn or self.stories[cursy]["url"] == "":
+            url = "https://news.ycombinator.com/item?id=" + str(self.stories[cursy]["id"])
+        else:
+            url = self.stories[cursy]["url"]
+
+        webbrowser.open_new_tab(url)
 
     def open_item(self):
         pass
@@ -108,30 +149,40 @@ class Screen():
     def resize(self):
         pass
 
-    def write_story(self, window, story, count):
+    def show_help(self):
+        pass
 
-        index = count-1
-        titlex = int(self.root_maxx*(2.0/3.0))
-        namex = titlex + 12
+    def _draw_labels(self):
+        self.header.addstr(3, self.titlex, "Title")
+        self.header.addstr(3, self.scorex + 2, "Score")
+        self.header.addstr(3, self.namex + 3, "By")
+        self.header.addstr(3, self.timex + 3, "Time")
+        self.header.refresh()
 
-        window.addstr(index,1,self.format_story_number(count),curses.A_BOLD)
+    def _calculate_dimensions(self):
+        self.timex  = self.root_maxx - 16
+        self.namex  = self.timex - 14
+        self.scorex = self.namex - 8
+        self.titlen = self.scorex - 4
 
-        window.addstr(self.format_score(story["score"]))
 
+    def _write_story(self, window, index, story):
 
-        window.addnstr(story["title"].encode('ascii','ignore'),titlex)
+        count  = index + 1
+        title  = story["title"].encode('ascii', 'ignore')
 
-        window.addstr(index,titlex,"| ")
-        window.addnstr(story["by"].encode('ascii','ignore'),12)
-
-        created_at = datetime.datetime.fromtimestamp(int(story["time"]))
-        delta = datetime.datetime.now() - created_at
-        hours = int(delta.seconds/60/60)
-        hours_ago = str(hours) + " " + " Hours Ago" if hours/10 < 1 else str(hours) + " Hours Ago"
-        window.addstr(index,namex," | " + hours_ago)
+        window.addstr(index, 1, self._format_story_number(count), curses.A_BOLD)
+        window.addnstr(index, self.titlex, title, self.titlen)
+        window.addstr(index, self.scorex, self._format_score(story["score"]))
+        window.addstr(index, self.namex, " | " + story["by"])
+        window.addstr(index, self.timex, " | " + self._format_time(story))
         window.refresh()
 
     def write_all(self,stories):
         self.stories = stories
-        for index,story in enumerate(self.stories,start=1):
-            self.write_story(self.content,story,index)
+
+        #self._calculate_dimensions()
+        self._draw_labels()
+
+        for index,story in enumerate(self.stories):
+            self._write_story(self.content,index,story)

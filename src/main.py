@@ -11,6 +11,10 @@ import traceback
 import sys
 from curses import KEY_ENTER,KEY_RESIZE
 
+class ResizeException(Exception):
+    def __init__(self):
+        self.message = "Please resize your terminal to have >= 80 columns and restart."
+
 def init():
     '''
     Initialize requisite directories and files.
@@ -34,22 +38,18 @@ def main(api,screen):
         if event == ord('j'):
             screen.move_down(screen.content)
         if event == ord('l'):
-            screen.open_link()
+            screen.open_link(False)
         if event == ord('h'):
-            screen.open_link_hn()
+            screen.open_link(True)
+        if event == ord('?'):
+            screen.show_help()
         if event == KEY_ENTER:
             screen.open_item()
         if event == KEY_RESIZE:
-            try:
-                screen.resize()
-                screen.check_dimensions()
-            except:
-                screen_size_exit()
+            screen.resize()
 
         if event == ord('q'):
             break
-        else:
-            pass
 
 if __name__=="__main__":
     init()
@@ -58,13 +58,17 @@ if __name__=="__main__":
 
     try:
         screen.check_dimensions()
-    except:
+    except ResizeException as resize:
         screen.end()
-        print "Please resize your terminal to have > 80 columns."
+        print resize.message
+        sys.exit(1)
+
     try:
         main(hn,screen)
         screen.end()
-    except:
+    except (ResizeException,Exception) as err:
         screen.end()
+        if type(err) == ResizeException:
+            print err.message
         traceback.print_exc(file=sys.stdout)
         sys.exit(1)

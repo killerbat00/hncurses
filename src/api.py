@@ -20,11 +20,11 @@ class HN():
         baseurl  -- HN API URL.
         config   -- config object with various params related.
         '''
-        self.config = config
+        self.config  = config
         self.baseurl = "/".join([self.config.BASE_URL, self.config.VERSION])
-        self.session = FuturesSession(max_workers=config.MAX_WORKERS)
+        self.session = FuturesSession(max_workers = config.MAX_WORKERS)
 
-    def _make_URL(self,endpoint,id=None):
+    def _make_URL(self, endpoint, id=None):
         '''
         Formats the URL with endpoint, id and json extension.
 
@@ -36,12 +36,12 @@ class HN():
         Returns:
         URL for specific object.
         '''
-        arr = [self.baseurl,endpoint,str(id)] if id\
-                else [self.baseurl,endpoint]
+        arr = [self.baseurl, endpoint, str(id)] if id\
+                else [self.baseurl, endpoint]
 
-        return "/".join(arr)+".json"
+        return "/".join(arr) + ".json"
 
-    def get_single(self,endpoint,id=None):
+    def get_single(self, endpoint, id=None):
         '''
         Retrieves a single item or user from the API.
 
@@ -54,8 +54,9 @@ class HN():
         On error, returns the error.
 
         '''
-        url = self._make_URL(endpoint,id)
+        url  = self._make_URL(endpoint, id)
         resp = self.session.get(url)
+
         try:
             result = resp.result()
             result = result.json()
@@ -68,7 +69,7 @@ class HN():
 
         return result
 
-    def get_multi(self,endpoint,ids):
+    def get_multi(self, endpoint, ids):
         '''
         Concurrently retrieve multiple objects from the API.
         Currently doesn't support retrieving mixed object types.
@@ -82,7 +83,8 @@ class HN():
         On error, returns List(err)
 
         '''
-        res = map(self.session.get, [self._make_URL(endpoint,id) for id in ids])
+        res = map(self.session.get, [self._make_URL(endpoint, id) for id in ids])
+
         try:
             results = [x.result().json() for x in res]
         except Exception as err:
@@ -109,13 +111,15 @@ class HN():
         List of JSON encoded story objects.
         '''
         from utils import _check_expired, _get_cache_file, _get_time
-        stories = []
+
+        stories   = []
         cachefile = self.config.CACHE_FILE
-        if _check_expired(cachefile,self.config.EXPIRES_IN):
+
+        if _check_expired(cachefile, self.config.EXPIRES_IN):
             storyList = self.get_single("topstories")
+            stories   = map(json.dumps, self.get_multi("item", storyList))
             f = _get_cache_file(cachefile,"w")
             f.write(str(_get_time()) + "\n") #store cache-file creation time to check for expiration
-            stories = map(json.dumps, self.get_multi("item",storyList))
             f.write("\n".join([x for x in stories])) #separate the stories with newline and write to file
             f.close()
         else:

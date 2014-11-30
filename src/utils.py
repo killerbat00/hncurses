@@ -30,7 +30,7 @@ def _filecheck(cachefile):
     if not os.path.isfile(cachefile):
         open(cachefile, "w").close()
 
-def _make_URL(endpoint,id=None):
+def _make_URL(endpoint, id=None):
     '''
     Construct URL for json API request.
 
@@ -42,12 +42,12 @@ def _make_URL(endpoint,id=None):
     Returns:
     URL for specific object.
     '''
-    arr = [BASE_URL,VERSION,endpoint,str(id)] if id\
-            else [BASE_URL,VERSION,endpoint]
+    arr = [BASE_URL, VERSION, endpoint, str(id)] if id\
+            else [BASE_URL, VERSION, endpoint]
 
-    return "/".join(arr)+".json"
+    return "/".join(arr) + ".json"
 
-def _check_expired(cachefile,expiry):
+def _check_expired(cachefile, expiry):
     '''
     Check if the cache file is expired.
 
@@ -63,7 +63,7 @@ def _check_expired(cachefile,expiry):
 
         return True if line1 == "" or int(line1) < _get_time() - expiry else False
 
-def _get_cache_file(filename,mode):
+def _get_cache_file(filename, mode):
     '''
     Open the cache file, throwing away the first line
     if we open in read mode. Doing so allows us to
@@ -79,7 +79,6 @@ def _get_cache_file(filename,mode):
     f = open(filename, mode)
     if mode == "r":
         f.readline()
-
     return f
 
 def _get_time():
