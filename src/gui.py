@@ -64,8 +64,9 @@ class Screen():
 
         self._draw_labels()
 
-        self.header.chgat(0,1,self.root_maxx-2,curses.A_UNDERLINE)
-        self.header.chgat(1,1,self.root_maxx-2,curses.A_UNDERLINE)
+        self.header.chgat(0, 1, self.root_maxx-2, curses.A_UNDERLINE)
+        self.header.chgat(0, 0, self.root_maxx, curses.A_REVERSE)
+        self.header.chgat(1, 1, self.root_maxx-2, curses.A_UNDERLINE)
         self.header.refresh()
     
     def draw_footer(self, story):
