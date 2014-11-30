@@ -24,9 +24,10 @@ def init():
 
 def main(api,screen):
     screen.draw_splash()
-    screen.draw_header()
 
     stories = api.get_frontpage()
+    screen.draw_header()
+
     screen.write_all(stories)
 
     while 1:
