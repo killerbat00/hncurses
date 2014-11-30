@@ -3,6 +3,9 @@ hncurses
 
 hncurses offers a basic terminal interface for browsing Hacker News.
 
+![Splash Screen](img/splash.tiff)
+![Usage](img/use.gif)
+
 ##requirements
 python-requests
 python-requests-futures
