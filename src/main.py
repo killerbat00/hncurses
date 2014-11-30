@@ -23,6 +23,16 @@ def init():
     _filecheck(config.CACHE_FILE)
 
 def main(api,screen):
+    '''
+    Main application logic for the terminal reader.
+    Draws the splash screen, header, content and footer as well as retrieves
+    the front page stories.
+    The input loop also lives here, listening for certain keys to be pressed.
+
+    Keyword arguments:
+    api      - api.HN instance from which to retrieve stories
+    screen   - gui.Screen instance to which to do all writing.
+    '''
     screen.draw_splash()
 
     stories = api.get_frontpage()
@@ -41,8 +51,6 @@ def main(api,screen):
             screen.open_link(False)
         if event == ord('h'):
             screen.open_link(True)
-        if event == ord('?'):
-            screen.show_help()
         if event == KEY_ENTER:
             screen.open_item()
         if event == KEY_RESIZE:
