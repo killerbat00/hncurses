@@ -6,6 +6,40 @@ import time
 
 from config import *
 
+LETTER_Y = [[" _______________________________________________ "],
+            ["|  ___________________________________________  |"],
+            ["| |                                           | |"],
+            ["| |                                           | |"],
+            ["| | YYYYYYYYYYYYY               YYYYYYYYYYYYY | |"],
+            ["| |  YYYYYYYYYYYYY             YYYYYYYYYYYYY  | |"],
+            ["| |   YYYYYYYYYYYYY           YYYYYYYYYYYYY   | |"],
+            ["| |    YYYYYYYYYYYYY         YYYYYYYYYYYYY    | |"],
+            ["| |     YYYYYYYYYYYYY       YYYYYYYYYYYYY     | |"],
+            ["| |      YYYYYYYYYYYYY     YYYYYYYYYYYYY      | |"],
+            ["| |       YYYYYYYYYYYYY   YYYYYYYYYYYYY       | |"],
+            ["| |        YYYYYYYYYYYYY YYYYYYYYYYYYY        | |"],
+            ["| |         YYYYYYYYYYYYYYYYYYYYYYYYY         | |"],
+            ["| |           YYYYYYYYYYYYYYYYYYYYY           | |"],
+            ["| |            YYYYYYYYYYYYYYYYYYY            | |"],
+            ["| |             YYYYYYYYYYYYYYYYY             | |"],
+            ["| |               YYYYYYYYYYYYY               | |"],
+            ["| |                YYYYYYYYYYY                | |"],
+            ["| |                YYYYYYYYYYY                | |"],
+            ["| |                YYYYYYYYYYY                | |"],
+            ["| |                YYYYYYYYYYY                | |"],
+            ["| |                YYYYYYYYYYY                | |"],
+            ["| |                YYYYYYYYYYY                | |"],
+            ["| |                YYYYYYYYYYY                | |"],
+            ["| |                YYYYYYYYYYY                | |"],
+            ["| |                YYYYYYYYYYY                | |"],
+            ["| |                                           | |"],
+            ["| |                                           | |"],
+            ["| |___________________________________________| |"],
+            ["|_______________________________________________|"],
+            ["                    HNCURSES                     "],
+            ["                                                 "],
+            ["          AUTHOR: Brian Houston Morrow           "]]
+
 def _dircheck(hn_dir):
     '''
     Check for hn cache directory and create

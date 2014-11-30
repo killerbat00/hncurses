@@ -23,10 +23,13 @@ def init():
     _filecheck(config.CACHE_FILE)
 
 def main(api,screen):
+    screen.draw_splash()
+
     stories = api.get_frontpage()
 
     screen.draw_header()
     screen.write_all(stories)
+    screen.draw_footer()
 
     screen.highlight(screen.content,0)
 

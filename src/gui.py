@@ -8,6 +8,8 @@ def init_curses():
     curses.cbreak()
     curses.noecho()
     curses.curs_set(0)
+    if curses.has_colors():
+        curses.start_color()
 
 def end_curses():
     curses.nocbreak()
@@ -24,12 +26,12 @@ class Screen():
         self.header = curses.newwin(5, self.root_maxx, 0, 0)
         self.headery, self.headerx = self.header.getmaxyx()
 
-        self.content = curses.newwin(100, self.root_maxx, self.headery, 0)
+        self.content = curses.newwin(self.root_maxy - self.headery - 1, self.root_maxx, self.headery, 0)
 
-        self.colors = curses.has_colors()
+        self.footer = curses.newwin(1, self.root_maxx, self.root_maxy-1, 0)
     
         self.stories = []
-        self.bottom_story = self.root_maxy - self.headery-1
+        self.bottom_story = self.root_maxy - self.headery - 1
 
         self.timex  = self.root_maxx - 16
         self.namex  = self.timex - 14
@@ -60,13 +62,29 @@ class Screen():
         self.header.addstr(1, startx, self.title)
         self.header.hline(2, 1, "-", self.root_maxx - 2)
         self.header.refresh()
+    
+    def draw_footer(self):
+        pass
+
+    def draw_splash(self):
+        from utils import LETTER_Y
+
+        midy    = int(self.root_maxy / 2)
+        midx    = int(self.root_maxx / 2)
+        lettery = midy - (len(LETTER_Y) / 2)
+        letterx = midx - (len(LETTER_Y[0][0]) / 2)
+
+        for index,line in enumerate(LETTER_Y,start=lettery):
+            self.root.addstr(index,letterx,"".join(line))
+
+        self.root.refresh()
 
     def highlight(self, window,y):
-        window.chgat(y, 0, self.root_maxx, curses.A_REVERSE)
+        window.chgat(y, 0, curses.A_REVERSE)
         window.refresh()
 
     def undo_highlight(self, window,y):
-        window.chgat(y, 0, self.root_maxx, curses.A_NORMAL)
+        window.chgat(y, 0, curses.A_NORMAL)
         window.refresh()
 
     def move_up(self, window):
@@ -86,7 +104,7 @@ class Screen():
         cursy,cursx = window.getyx()
         newcursy    = cursy+1
 
-        if newcursy > self.bottom_story:
+        if newcursy >= self.bottom_story:
             self.next_page(window)
             return
 
@@ -115,13 +133,13 @@ class Screen():
         score_str = str(score)
 
         if len(score_str) == 1:
-            score = "| (" + score_str + ")    "
+            score = "| " + score_str + "    "
         elif len(score_str) == 2:
-            score = "| (" + score_str + ")   "
+            score = "| " + score_str + "   "
         elif len(score_str) == 3:
-            score = "| (" + score_str + ")  "
+            score = "| " + score_str + "  "
         else:
-            score = "| (" + score_str + ") "
+            score = "| " + score_str + " "
 
         return score.encode('ascii', 'ignore')
 
@@ -160,6 +178,7 @@ class Screen():
         self.header.refresh()
 
     def _calculate_dimensions(self):
+        maxx, maxy = self.root.getmaxyx()
         self.timex  = self.root_maxx - 16
         self.namex  = self.timex - 14
         self.scorex = self.namex - 8
@@ -171,7 +190,7 @@ class Screen():
         count  = index + 1
         title  = story["title"].encode('ascii', 'ignore')
 
-        window.addstr(index, 1, self._format_story_number(count), curses.A_BOLD)
+        window.addstr(index, 1, self._format_story_number(count))
         window.addnstr(index, self.titlex, title, self.titlen)
         window.addstr(index, self.scorex, self._format_score(story["score"]))
         window.addstr(index, self.namex, " | " + story["by"])
@@ -185,4 +204,6 @@ class Screen():
         self._draw_labels()
 
         for index,story in enumerate(self.stories):
+            if index >= self.bottom_story:
+                break
             self._write_story(self.content,index,story)
